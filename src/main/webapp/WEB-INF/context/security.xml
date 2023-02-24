@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+            http://www.springframework.org/schema/security
+            http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+            
+    <http auto-config="false" use-expressions="true" disable-url-rewriting="true">
+    
+   <!--  neu chua dang nhap ma co y vao ->redirect ve trang chu  -->
+    <intercept-url pattern="/admin/home" access="hasAnyRole('ADMIN')" ></intercept-url>
+    	
+    	<access-denied-handler error-page="/accessDenied" />
+        <form-login  login-page="/login"
+                     username-parameter="j_email"
+                     password-parameter="j_password"
+                     login-processing-url="/j_spring_security_check"
+                     authentication-success-handler-ref="customSuccessHandler"
+                     authentication-failure-url="/login?incorrectAccount"/>
+        <session-management invalid-session-url="/login?accessDenied"/>
+        <logout delete-cookies="JSESSIONID"/>    	
+    </http>
+   <!--  xu ly password theo kieu MD5  -->
+     <authentication-manager >
+        <authentication-provider user-service-ref="customUserDetailsService">
+        		<password-encoder ref="bcryptEncoder"/>
+        </authentication-provider>
+    </authentication-manager> 
+    <beans:bean id="bcryptEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" /><!--bcryptEncoder org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder -->
+    <beans:bean id="customUserDetailsService" class="DreamShop.service.impl.CustomUserDetailsService" />
+    <beans:bean id="customSuccessHandler" class="DreamShop.security.CustomSuccessHandler" />
+    
+    
+</beans:beans>
